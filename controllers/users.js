@@ -5,7 +5,7 @@ const User = require('../models/User');
 const app = express();
 
 
-
+//Getting all users
 const getAllUsers = async (req, res) => {
   try {
     const data = await User.find()
@@ -17,10 +17,10 @@ const getAllUsers = async (req, res) => {
   }
 }
 
-
+//Creating new user
 const CreateUser = async (req, res) => {
   try {
-    // Extract user information from the request body
+  
     const { username, email, password } = req.body;
 
     // Check if user already exists
@@ -29,20 +29,20 @@ const CreateUser = async (req, res) => {
       return res.status(200).json({ error: 'User with this email already exists',statusCode:-1 });
     }
 
-    // Hash the password
+    //Encrypting password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user object
+    // Creating a new user object
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
     });
 
-    // Save the user to the database
+    // Saving the user to the database
     const data = await newUser.save();
 
-    // Return a success response
+   
     res.status(200).json({ message: 'User registered successfully', user: data,statusCode:0 });
   } catch (error) {
     console.error(error);
@@ -50,13 +50,16 @@ const CreateUser = async (req, res) => {
   }
 };
 
+
+//Logging in
 const loginUser = async (req, res) => {
   try {
-    // Extract user information from the request body
+
     const { username, password } = req.body;
 
-    // Find the user by email
+    // Finding the user by username
     const user = await User.findOne({ username });
+    //I user doesn't exists
     if (!user) {
       return res.status(200).json({ error: 'Invalid email or password', statusCode: -1 });
     }
@@ -67,7 +70,7 @@ const loginUser = async (req, res) => {
       return res.status(200).json({ error: 'Invalid email or password', statusCode: -1 });
     }
 
-    // Password is valid, return success response
+    // If Password is valid, return success response
     res.status(200).json({ message: 'Login successful', user, statusCode: 0 });
   } catch (error) {
     console.error(error);
